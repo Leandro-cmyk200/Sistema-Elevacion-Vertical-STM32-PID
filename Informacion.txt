@@ -1,0 +1,1 @@
+Este codigo solo funciona para STM 32 NUCLEO-F103RB
