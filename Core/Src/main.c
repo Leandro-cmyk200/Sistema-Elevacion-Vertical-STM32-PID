@@ -27,7 +27,6 @@
 #include <i2c_lcd.h>
 #include <string.h>
 /* USER CODE END Includes */
-
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 float Kp = 1.0, Ki = 0.5, Kd = 0.1;
@@ -36,18 +35,11 @@ float pid_output;
 float setpoint = 13.0;
 
 // Solo usaremos el sensor ultrasónico
-
 void update_motor_pid(float setpoint, float measurement, float distancia);
 void set_motor_direction(uint8_t forward);
 void setPWM(int16_t duty_percent);
 void send_motor_status_i2c(int16_t pwm_value, float distancia);
-
-
 // Control de dirección (GPIO)
-
-
-
-
 
 /* USER CODE END PTD */
 
@@ -56,35 +48,31 @@ void send_motor_status_i2c(int16_t pwm_value, float distancia);
 #ifndef SLAVE_ADDRESS_LCD
 #define SLAVE_ADDRESS_LCD (0x27 << 1) // o (0x3F << 1) según tu módulo
 #endif
-
 /* USER CODE END PD */
-
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 /* USER CODE END PM */
-
 /* Private variables ---------------------------------------------------------*/
+
 ADC_HandleTypeDef hadc1;
-
 I2C_HandleTypeDef hi2c1;
-
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
-
 UART_HandleTypeDef huart2;
-
 osThreadId defaultTaskHandle;
 osThreadId Task_PIDHandle;
 osThreadId Task_LCDHandle;
+
 /* USER CODE BEGIN PV */
+
 uint32_t echo_start = 0, echo_end = 0;
 uint8_t echo_captured = 0;
 float distancia = 0.0f;
 int pwm_value = 0;
 float ultima_distancia_valida = 0.0f;
+
 // Failover monitoring
 uint32_t failover_start = 0; // HAL_GetTick timestamp when saturation started
 uint8_t in_failover = 0;     // 0 = normal, 1 = using backup motor (PB5)
@@ -95,10 +83,9 @@ uint32_t aux_fail_start = 0; // when backup motor is saturated
 uint8_t system_fault = 0; // 0=ok, 1=fault/shutdown
 uint8_t motor1_disabled = 0; // 0=allowed, 1=permanently disabled after failover
 
-
 /* USER CODE END PV */
-
 /* Private function prototypes -----------------------------------------------*/
+
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
@@ -113,6 +100,7 @@ void StartTaskPID(void const * argument);
 void StartTaskLCD(void const * argument);
 
 /* USER CODE BEGIN PFP */
+
 float read_setpoint(void);
 void loop_ultrasonic_pid(void);
 void update_motor_pid(float setpoint, float measurement, float distancia);
@@ -139,7 +127,6 @@ void lcd_print_diagnostico(float distancia_cm, int16_t pwm_percent) {
     lcd_send_string(linea1);
     strcpy(prev_linea1, linea1);
   }
-
   if (strcmp(linea2, prev_linea2) != 0) {
     lcd_put_cursor(1, 0);
     lcd_send_string(linea2);
@@ -148,15 +135,12 @@ void lcd_print_diagnostico(float distancia_cm, int16_t pwm_percent) {
 }
 
 /* USER CODE END PFP */
-
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 int __io_putchar(int ch) {
     HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
-
-
 void send_trigger_pulse(void) {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
     HAL_Delay(2);
@@ -164,7 +148,6 @@ void send_trigger_pulse(void) {
     HAL_Delay(10);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
 }
-
 float measure_distance_cm(void) {
     echo_captured = 0;
     __HAL_TIM_SET_CAPTUREPOLARITY(&htim4, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
@@ -177,7 +160,6 @@ float measure_distance_cm(void) {
     }
     return -1;
 }
-
 /* USER CODE END 0 */
 
 /**
@@ -186,13 +168,9 @@ float measure_distance_cm(void) {
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
